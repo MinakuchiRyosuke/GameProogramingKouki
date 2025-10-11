@@ -52,15 +52,25 @@ int WINAPI WinMain(
 
     ShowWindow(hwnd, nCmdShow); //ウィンドウを表示
 
-    // 3. メッセージループ
-    MSG msg{};      //メッセージを格納する構造体
-    while (PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE))     //メッセージが来るまで待機
+
+    bool nextFrame = true;
+    while (nextFrame)
     {
-        TranslateMessage(&msg);     //キーボードメッセージを使いやすい形に変換
-        DispatchMessage(&msg);      //適切なウィンドウプロシージャに送信 
+        // 3. メッセージループ
+        MSG msg{};      //メッセージを格納する構造体
+        while (PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE))     //メッセージが来るまで待機
+        {
+            if (msg.message == WM_QUIT)
+            {
+                nextFrame = false;
+            }
+            TranslateMessage(&msg);     //キーボードメッセージを使いやすい形に変換
+            DispatchMessage(&msg);      //適切なウィンドウプロシージャに送信 
+        }
     }
+    
 
-
+    return 0;
     
 }
 
