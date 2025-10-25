@@ -30,14 +30,14 @@ IDXGIAdapter* Dx12::GetHardwareAdapter(IDXGIFactory4 * factory)
     for (UINT adapterIndex = 0; ; ++adapterIndex)
     {
         adapter = nullptr;
-        if (DXGI_ERROR_NOT_FOUND == factory->EnumAdapters1(adapterIndex, &adapter))
-        {
-            break; // アダプターが見つからない場合は終了
-        }
+        //if (DXGI_ERROR_NOT_FOUND == factory->EnumAdapters1(adapterIndex, &adapter))
+        //{
+        //    break; // アダプターが見つからない場合は終了
+        //}
 
         // アダプター情報を取得
         DXGI_ADAPTER_DESC1 desc;
-        adapter->GetDesc1(&desc);
+        //adapter->GetDesc1(&desc);
 
         // ソフトウェアアダプターをスキップ
         if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
@@ -109,7 +109,7 @@ ID3D12CommandQueue* CreateCommandQueue(ID3D12Device* device)
     }
 
     // デバッグ用の名前設定（任意だが推奨）
-    commandQueue->SetName("Main Command Queue");
+    //commandQueue->SetName("Main Command Queue");
 
     return commandQueue;
 }
