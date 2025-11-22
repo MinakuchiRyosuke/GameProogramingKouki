@@ -60,7 +60,6 @@ IDXGIAdapter1* Dx12::GetHardwareAdapter(IDXGIFactory4* factory) {
 // -------------------------------------------------------------------------
 // -------------------------------------------------------------------------
 ID3D12Device* Dx12::CreateD3D12Device(IDXGIAdapter1* adapter) {
-    ID3D12Device* device;
 
     // デバイス作成を試行
     HRESULT hr = D3D12CreateDevice(
