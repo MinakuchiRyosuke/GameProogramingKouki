@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DX12.h"
+#include"Dx12.h"
 
 //ディスクリプタヒープ制御クラス
 class DescriptorHeap final {

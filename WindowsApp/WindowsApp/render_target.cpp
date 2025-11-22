@@ -11,7 +11,7 @@ RenderTarget::~RenderTarget() {
 	renderTargets_.clear();
 
 	[[nodiscard]] bool RenderTarget::createBackBuffer(const Dx12& dx12, const Dx12& swapchain, const DescriptorHeap& heap)noexcept; {
-		const auto& desc = swapchain.swapChain;
+		const auto& desc = dx12.swapChain;
 		renderTargets_.resize(desc.BufferCount);
 		auto handle = heap.get()->GetCPUDescriptorHandleForHeapAtart();
 		auto heapType = heap.getType();
