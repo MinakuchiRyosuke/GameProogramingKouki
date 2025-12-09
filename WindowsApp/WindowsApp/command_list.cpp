@@ -1,63 +1,55 @@
-//コマンドアロケータ制御クラス
+//コマンドリスト制御クラス
 #include"command_list.h"
 #include"cassert"
 
 //デストラクタ
-CommandAllocator::~CommandAllocator() {
+CommandList::~CommandList() {
 	//コマンドアロケータの解放
-	if (commandAllocator_) {
-		commandAllocator_->Release();
-		commandAllocator_ = nullptr;
+	if (commandList_) {
+		commandList_->Release();
+		commandList_ = nullptr;
 	}
 }
 //---------------------------------------------------------------------------------
 /**
- * @brief	コマンドキューの生成
+ * @brief	コマンドリスト作成
  * @param	device	デバイスクラスのインスタンス
- * @return	成功すれば true
+ * @param	command	コマンドアロケータクラスのインスタンス
+ * @return	生成の成否
  */
-[[nodiscard]] bool CommandAllocator::create(const Dx12& dx12, const D3D12_COMMAND_LIST_TYPE type)noexcept {
-	//コマンドリストのタイプを設定
-	type_ = type;
-	//コマンドアロケータの生成
-	const auto hr = dx12.device->CreateCommandAllocator(type_, IID_PPV_ARGS(&commandAllocator_));
+[[nodiscard]] bool CommandList::create(const Dx12& dx12, const CommandAllocator& commandAllocator)noexcept {
+	//コマンドリストの作成
+	const auto hr = dx12.device->CreateCommandList(0, commandAllocator.getType(), commandAllocator.get(), nullptr, IID_PPV_ARGS(&commandList_));
 	if (FAILED(hr)) {
-		assert(false && "コマンドアロケータの作成に失敗しました");
+		assert(false && "コマンドリストの作成に失敗しました");
 		return false;
 	}
 
+	//コマンドリストを初期化状態に設定
+	commandList_->Close();
 	return true;
 }
 //---------------------------------------------------------------------------------
 /**
- * @brief	コマンドアロケータをリセットする
+ * @brief	コマンドリストのリセット
+ * @param	commandAllocator	コマンドアロケータクラスのインスタンス
  */
-void CommandAllocator::reset()noexcept {
-	if (!commandAllocator_) {
-		assert(false && "コマンドアロケータが未作成です");
-	}
-	commandAllocator_->Reset();
+void CommandList::reset(const CommandAllocator& commandAllocator)noexcept {
+	if (!commandList_){
+		assert(false && "コマンドリストが未作成です");
+		}
+	//コマンドリストをリセット
+	commandList_->Reset(commandAllocator.get(), nullptr);
 }
 //---------------------------------------------------------------------------------
 /**
- * @brief	コマンドアロケータを取得する
- * @return	コマンドアロケータのポインタ
+ * @brief	コマンドリストを取得する
+ * @return	コマンドリストのポインタ
  */
-[[nodiscard]] ID3D12CommandAllocator* CommandAllocator::get() const noexcept {
-	if (!commandAllocator_) {
-		assert(false && "コマンドアロケータが未作成です");
+[[nodiscard]] ID3D12GraphicsCommandList* CommandList::get()const noexcept {
+	if (!commandList_) {
+		assert(false && "コマンドリストが未作成です");
 		return nullptr;
 	}
-	return commandAllocator_;
-}
-//---------------------------------------------------------------------------------
-/**
- * @brief	コマンドリストのタイプを取得する
- * @return	コマンドリストのタイプ
- */
-[[nodiscard]] D3D12_COMMAND_LIST_TYPE CommandAllocator::getType()const noexcept {
-	if (!commandAllocator_) {
-		assert(false && "コマンドリストのタイプが未設定です");
-	}
-	return type_;
+	return commandList_;
 }

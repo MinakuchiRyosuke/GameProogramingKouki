@@ -20,7 +20,7 @@ public:
 	 * @param	command	コマンドアロケータクラスのインスタンス
 	 * @return	生成の成否
 	 */
-	[[nodiscard]] bool create(const Dx12& dx12, CommandAllocator& commandAllocator)noexcept;
+	[[nodiscard]] bool create(const Dx12& dx12, const CommandAllocator& commandAllocator)noexcept;
 	//---------------------------------------------------------------------------------
 	/**
 	* @brief	コマンドリストのリセット
