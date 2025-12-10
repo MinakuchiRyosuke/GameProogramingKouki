@@ -22,4 +22,20 @@ DescriptorHeap::~DescriptorHeap() {
 		assert(false && "ディスクリプタヒープの生成に失敗しました");
 		return false;
 	}
+	return true;
+}
+
+[[nodiscard]] ID3D12DescriptorHeap* DescriptorHeap::get() const noexcept {
+	if (!heap_) {
+		assert(false && "ディスクリプタヒープが未完成です");
+		return nullptr;
+	}
+	return heap_;
+}
+
+[[nodiscard]] D3D12_DESCRIPTOR_HEAP_TYPE DescriptorHeap::getType() const noexcept {
+	if (!heap_) {
+		assert(false && "ディスクリプタヒープが未完成です");
+	}
+	return type_;
 }

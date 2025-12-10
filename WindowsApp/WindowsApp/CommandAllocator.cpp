@@ -54,7 +54,7 @@ void CommandAllocator::reset()noexcept {
  * @brief	コマンドリストのタイプを取得する
  * @return	コマンドリストのタイプ
  */
-[[nodiascard]] D3D12_COMMAND_LIST_TYPE CommandAllocator::getType() const noexcept {
+[[nodiscard]] D3D12_COMMAND_LIST_TYPE CommandAllocator::getType() const noexcept {
 	if (!commandAllocator_) {
 		assert(false && "コマンドリストのタイプが未設定です");
 	}
