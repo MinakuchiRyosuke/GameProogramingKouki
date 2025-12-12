@@ -5,10 +5,11 @@
 class Dx12 {
 public:
     // コンストラクタ
-    Dx12() {}
+    Dx12() = default;
     // デストラクタ
-    ~Dx12() {}
+    ~Dx12();
 
+    [[nodiscard]] bool setDisplayAdapter() noexcept;
     IDXGIFactory4* CreateDXGIFactory();
     IDXGIAdapter1* GetHardwareAdapter(IDXGIFactory4* factory);
     ID3D12Device* CreateD3D12Device(IDXGIAdapter1* adapter);
