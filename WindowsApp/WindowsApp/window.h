@@ -21,7 +21,8 @@ public:
 
 private:
 	HWND handle_{};
-	int witdh_{};
+	int width_{};
 	int height_{};
 };
+
 
