@@ -1,8 +1,40 @@
 #include "Dx12.h"
+#include <cassert>
 
 #pragma comment(lib, "d3d12.lib") 
 #pragma comment(lib, "dxgi.lib")
 
+Dx12::~Dx12() {
+    if (dxgiFactory_) {
+        dxgiFactory_->Release();
+        dxgiFactory_ = nullptr;
+    }
+    if (dxgiAdapter_) {
+        dxgiAdapter_->Release();
+        dxgiAdapter_ = nullptr;
+    }
+}
+
+[[nodiscard]] bool Dx12::setDisplayAdapter()noexcept {
+#if _DEBUG
+    ID3D12Debug* debug;
+    if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debug)))) {
+        debug->EnableDebugLayer();
+    }
+#endif
+
+    {
+        UINT createFactoryFlags = 0;
+#if _DEBUG
+        createFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
+#endif
+        const auto hr = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory_));
+        if (FAILED(hr)) {
+            assert(false && "DXGIファクトリーの作成に失敗");
+            return false;
+        }
+    }
+}
 // -------------------------------------------------------------------------
 // -------------------------------------------------------------------------
 IDXGIFactory4* Dx12::CreateDXGIFactory() {

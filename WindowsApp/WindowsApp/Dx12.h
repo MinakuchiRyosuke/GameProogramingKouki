@@ -1,6 +1,7 @@
 #pragma once
 #include <d3d12.h>
 #include <dxgi1_4.h>
+#include "window.h"
 
 class Dx12 {
 public:
@@ -10,14 +11,20 @@ public:
     ~Dx12();
 
     [[nodiscard]] bool setDisplayAdapter() noexcept;
-    IDXGIFactory4* CreateDXGIFactory();
-    IDXGIAdapter1* GetHardwareAdapter(IDXGIFactory4* factory);
-    ID3D12Device* CreateD3D12Device(IDXGIAdapter1* adapter);
-    ID3D12CommandQueue* CreateCommandQueue(ID3D12Device* device);
-    IDXGISwapChain3* CreateSwapChain(IDXGIFactory4* factory, ID3D12CommandQueue* commandQueue, HWND hwnd);
-    void                EnableDebugLayer();
-    //ここで呼んでいるのは変数（先生のスクリプトは関数を呼び出している）()を付けえて呼べない
-    ID3D12Device* device;
-    IDXGISwapChain3* swapChain;     //ポインタ変数なので->を後ろにつけて関数を呼ぶ
-    DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+    [[nodiscard]] IDXGIFactory4* factory() const noexcept;
+    [[nodiscard]] IDXGIAdapter1* displayAdapter() const noexcept;
+    [[nodiscard]] bool create(const Dx12& dxgi) noexcept;
+    [[nodiscard]] ID3D12Device* getDevice() const noexcept;
+    [[nodiscard]] bool create(const Dx12& device)noexcept;
+    [[nodiscard]] ID3D12CommandQueue* getQueue() const noexcept;
+    [[nodiscard]] bool create(const Dx12& dxgi, const Window& window, const Dx12& commandQueue)noexcept;
+    [[nodiscard]] IDXGISwapChain3* getSwapChain() const noexcept;
+    [[nodiscard]] const DXGI_SWAP_CHAIN_DESC1& getDesc() const noexcept;
+private:
+    IDXGIFactory4* dxgiFactory_{};
+    IDXGIAdapter1* dxgiAdapter_{};
+    ID3D12Device* device_;
+    ID3D12CommandQueue* commandQueue_{};
+    IDXGISwapChain3* swapChain_{};      
+    DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
 };
