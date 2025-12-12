@@ -19,7 +19,7 @@ CommandList::~CommandList() {
  */
 [[nodiscard]] bool CommandList::create(const Dx12& dx12, const CommandAllocator& commandAllocator)noexcept {
 	//コマンドリストの作成
-	const auto hr = dx12.device->CreateCommandList(0, commandAllocator.getType(), commandAllocator.get(), nullptr, IID_PPV_ARGS(&commandList_));
+	const auto hr = dx12.getDevice()->CreateCommandList(0, commandAllocator.getType(), commandAllocator.get(), nullptr, IID_PPV_ARGS(&commandList_));
 	if (FAILED(hr)) {
 		assert(false && "コマンドリストの作成に失敗しました");
 		return false;

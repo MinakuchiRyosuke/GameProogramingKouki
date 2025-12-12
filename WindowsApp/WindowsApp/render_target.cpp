@@ -24,7 +24,7 @@ RenderTarget::~RenderTarget() {
  */
 [[nodiscard]] bool RenderTarget::createBackBuffer(const Dx12& dx12, const DescriptorHeap& heap)noexcept{
 	//スワップチェインの設定を取得
-	const auto& desc = dx12.swapChainDesc;
+	const auto& desc = dx12.getDesc();
 	//レンダーターゲットリソースのサイズを設定
 	renderTargets_.resize(desc.BufferCount);
 	//ディスクリプタヒープのハンドルを取得
@@ -34,15 +34,15 @@ RenderTarget::~RenderTarget() {
 	assert(heapType == D3D12_DESCRIPTOR_HEAP_TYPE_RTV && "ディスクリプタヒープのタイプがRTVではありません");
 	//バックバッファの生成
 	for (uint8_t i = 0; i < desc.BufferCount; ++i) {
-		const auto hr = dx12.swapChain->GetBuffer(i, IID_PPV_ARGS(&renderTargets_[i]));
+		const auto hr = dx12.getSwapChain()->GetBuffer(i, IID_PPV_ARGS(&renderTargets_[i]));
 		if (FAILED(hr)) {
 			assert(false && "バックバッファの取得に失敗しました");
 			return false;
 		}
 		//レンダーターゲットビューを作成してディスクリプタヒープのハンドルと関連付ける
-		dx12.device->CreateRenderTargetView(renderTargets_[i], nullptr, handle);
+		dx12.getDevice()->CreateRenderTargetView(renderTargets_[i], nullptr, handle);
 		//次のハンドルへ移動
-		handle.ptr += dx12.device->GetDescriptorHandleIncrementSize(heapType);
+		handle.ptr += dx12.getDevice()->GetDescriptorHandleIncrementSize(heapType);
 	}
 
 	return true;
@@ -65,7 +65,7 @@ RenderTarget::~RenderTarget() {
 	auto heapType = heap.getType();
 	assert(heapType == D3D12_DESCRIPTOR_HEAP_TYPE_RTV && "ディスクリプタヒープのタイプがRTVではありません");
 	//インデックスに応じてハンドルを移動
-	handle.ptr += index * dx12.device->GetDescriptorHandleIncrementSize(heapType);
+	handle.ptr += index * dx12.getDevice()->GetDescriptorHandleIncrementSize(heapType);
 	return handle;
 }
 

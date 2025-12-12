@@ -13,11 +13,12 @@ public:
     [[nodiscard]] bool setDisplayAdapter() noexcept;
     [[nodiscard]] IDXGIFactory4* factory() const noexcept;
     [[nodiscard]] IDXGIAdapter1* displayAdapter() const noexcept;
-    [[nodiscard]] bool create(const Dx12& dxgi) noexcept;
+    [[nodiscard]] bool createDxgi(const Dx12& dx12) noexcept;
     [[nodiscard]] ID3D12Device* getDevice() const noexcept;
-    [[nodiscard]] bool create(const Dx12& device)noexcept;
-    [[nodiscard]] ID3D12CommandQueue* getQueue() const noexcept;
-    [[nodiscard]] bool create(const Dx12& dxgi, const Window& window, const Dx12& commandQueue)noexcept;
+    [[nodiscard]] bool createDevice(const Dx12& dx12)noexcept;
+    [[nodiscard]] ID3D12CommandQueue* getCommandQueue() const noexcept;
+    [[nodiscard]] bool createCommandQueue(const Dx12& dx12)noexcept;
+    [[nodiscard]] bool createSwapChain(const Dx12& dx12, const Window& window)noexcept;
     [[nodiscard]] IDXGISwapChain3* getSwapChain() const noexcept;
     [[nodiscard]] const DXGI_SWAP_CHAIN_DESC1& getDesc() const noexcept;
 private:

@@ -22,51 +22,52 @@ public:
 			return false;
 		}
 		//DXGIの作成
-		if () {
+		if (!dx12Instance_.setDisplayAdapter()) {
 			assert(false && "DXGIの作成に失敗しました");
 			return false;
 		}
 		//デバイスの作成
-		if () {
+		if (!dx12Instance_.createDevice(dx12Instance_)) {
 			assert(false && "デバイスの作成に失敗しました");
 			return false;
 		}
 		//コマンドキューの生成
-		if () {
+		if (!dx12Instance_.createCommandQueue(dx12Instance_)) {
 			assert(false && "コマンドキューの作成に失敗しました");
 			return false;
 		}
 		//スワップチェインの生成
-		if (!swapChainInstance_.create(dxgiInstance_, windowInstance_, commandQueueInstance_)) {
-			assert(false && "スワップチェインの作成に失敗しました");
-			return false;
-		}
-		//ディスクリプタヒープの生成
-		if (!descriptorHeapInstance_.create(deviceInstance_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, swapChainInstance_.getDesc().BufferCount)) {
+		if (!dx12Instance_.createSwapChain(dx12Instance_, windowInstance_)) {
 			assert(false && "ディスクリプタヒープの作成に失敗しました");
 			return false;
 		}
+		//ディスクリプタヒープの生成
+		if (!descriptorHeapInstance_.create(dx12Instance_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, dx12Instance_.getDesc().BufferCount)) {
+			assert(false && "ディスクリプタヒープの生成に失敗しました");
+			return false;
+		}
+
 		//レンダーターゲットの生成
-		if (!renderTargetInstance_.createBackBuffer(deviceInstance_, swapChainInstance_, descriptorHeapInstance_)) {
+		if (!renderTargetInstance_.createBackBuffer(dx12Instance_, descriptorHeapInstance_)) {
 			assert(false && "レンダーターゲットの作成に失敗しました");
 			return false;
 		}
 		//コマンドアロケータの生成
-		if (!commandAllocatorInstance_[0].create(deviceInstance_, D3D12_COMMAND_LIST_TYPE_DIRECT) {
+		if (!commandAllocatorInstance_[0].create(dx12Instance_, D3D12_COMMAND_LIST_TYPE_DIRECT)) {
 			assert(false && "コマンドアロケータの作成に失敗しました");
 			return false;
 		}
-		if (!commandAllocatorInstance_[1].create(deviceInstance_, D3D12_COMMAND_LIST_TYPE_DIRECT) {
+		if (!commandAllocatorInstance_[1].create(dx12Instance_, D3D12_COMMAND_LIST_TYPE_DIRECT) ){
 			assert(false && "コマンドアロケータの作成に失敗しました");
 			return false;
 		}
 		//コマンドリストの生成
-		if (!commandListInstance_.create(deviceInstance_, commandAllocatorInstance_[0]) {
+		if (!commandListInstance_.create(dx12Instance_, commandAllocatorInstance_[0])) {
 			assert(false && "コマンドリストの作成に失敗しました");
 			return false;
 		}
 		//フェンスの生成
-		if (!fenceInstance_.create(deviceInstance_) {
+		if (!fenceInstance_.create(dx12Instance_)) {
 			assert(false && "フェンスの作成に失敗しました");
 			return false;
 		}
@@ -83,10 +84,7 @@ public:
 
 private:
 	Window				windowInstance_{};
-	Dx12				dxgiInstance_{};
-	Dx12				deviceInstance_{};
-	Dx12				commandQueueInstance_{};
-	Dx12				swapChainInstance_{};
+	Dx12				dx12Instance_{};
 	DescriptorHeap		descriptorHeapInstance_{};
 	RenderTarget		renderTargetInstance_{};
 	CommandAllocator	commandAllocatorInstance_[2]{};
@@ -98,7 +96,7 @@ private:
 };
 
 //エントリー関数
-int WINAPI Winmain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	//アプリケーションクラスのインスタンスを生成
 	Application app;
 

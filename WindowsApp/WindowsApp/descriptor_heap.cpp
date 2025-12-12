@@ -17,7 +17,7 @@ DescriptorHeap::~DescriptorHeap() {
 
 	type_ = type;
 
-	HRESULT hr = dx12.device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&heap_));
+	HRESULT hr = dx12.getDevice()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&heap_));
 	if (FAILED(hr)) {
 		assert(false && "ディスクリプタヒープの生成に失敗しました");
 		return false;

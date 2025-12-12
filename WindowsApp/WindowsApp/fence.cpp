@@ -18,7 +18,7 @@ Fence::~Fence() {
  */
 [[nodiscard]] bool Fence::create(const Dx12& dx12)noexcept {
 	//フェンスの作成
-	HRESULT hr = dx12.device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
+	HRESULT hr = dx12.getDevice()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
 	if (FAILED(hr)) {
 		assert(false && "フェンスの作成に失敗しました");
 		return false;

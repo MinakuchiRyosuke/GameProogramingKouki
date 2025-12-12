@@ -20,7 +20,7 @@ CommandAllocator::~CommandAllocator() {
 	//コマンドリストのタイプを設定
 	type_ = type;
 	//コマンドアロケータの生成
-	const auto hr = dx12.device->CreateCommandAllocator(type_, IID_PPV_ARGS(&commandAllocator_));
+	const auto hr = dx12.getDevice()->CreateCommandAllocator(type_, IID_PPV_ARGS(&commandAllocator_));
 	if (FAILED(hr)) {
 		assert(false && "コマンドアロケータの作成に失敗しました");
 		return false;
