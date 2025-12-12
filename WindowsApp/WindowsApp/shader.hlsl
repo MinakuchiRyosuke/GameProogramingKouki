@@ -1,0 +1,47 @@
+// 頂点バッファの内容をそのまま出力するシェーダ
+
+// 頂点シェーダの入力構造体
+struct VSInput
+{
+	float3 position : POSITION; // 入力：頂点座標
+	float4 color : COLOR;		// 入力：頂点色
+};
+
+// 頂点シェーダの出力構造体
+struct VSOutput
+{
+	float4 position : SV_POSITION; // 出力：変換後座標
+	float4 color : COLOR; // 出力：頂点色
+};
+
+// ピクセルシェーダの入力構造体
+struct PSInput
+{
+	float4 position : SV_POSITION; // 入力：画面座標
+	float4 color : COLOR; // 入力：補間された色
+};
+
+// -------------------------------
+// 頂点シェーダ
+// -------------------------------
+VSOutput vs(VSInput input)
+{
+	VSOutput output;
+    
+    // 3D座標を4D同次座標に変換
+	output.position = float4(input.position, 1.0f);
+    
+    // 色情報をそのまま次の段階に渡す
+	output.color = input.color;
+    
+	return output;
+}
+
+// -------------------------------
+// ピクセルシェーダ
+// -------------------------------
+float4 ps(PSInput input) : SV_TARGET
+{	
+	// 色をそのまま出力
+	return input.color;
+}

@@ -6,6 +6,10 @@
 #include "descriptor_heap.h"
 #include "render_target.h"
 #include "fence.h"
+#include "root_signature.h"
+#include "shader.h"
+#include "pipline_state_object.h"
+#include "triangle_polygon.h"
 
 #include <cassert>
 
@@ -71,6 +75,26 @@ public:
 			assert(false && "フェンスの作成に失敗しました");
 			return false;
 		}
+		//三角形ポリゴンの生成
+		if (!trianglePolygonInstance_.create(dx12Instance_)) {
+			assert(false && "三角形ポリゴンの作成に失敗しました");
+			return false;
+		}
+		// ルートシグネチャの生成
+		if (!rootSignatureInstance_.create(dx12Instance_)) {
+			assert(false && "ルートシグネチャの作成に失敗しました");
+			return false;
+		}
+		// シェーダーの生成
+		if (!shaderInstance_.create(dx12Instance_)) {
+			assert(false && "シェーダーの作成に失敗しました");
+			return false;
+		}
+		// パイプラインステートオブジェクトの生成
+		if (!piplineStateObjectInstance_.create(dx12Instance_, shaderInstance_, rootSignatureInstance_)) {
+			assert(false && "パイプラインステートオブジェクトの作成に失敗しました");
+			return false;
+		}
 
 		return true;
 	}
@@ -102,6 +126,34 @@ public:
 			//レンダーターゲットのクリア
 			const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };	//赤色でクリア
 			commandListInstance_.get()->ClearRenderTargetView(handles[0], clearColor, 0, nullptr);
+
+			// パイプラインステートの設定
+			commandListInstance_.get()->SetPipelineState(piplineStateObjectInstance_.get());
+
+			// ルートシグネチャの設定
+			commandListInstance_.get()->SetGraphicsRootSignature(rootSignatureInstance_.get());
+
+			// ビューポートの設定
+			const auto [w, h] = windowInstance_.size();
+			D3D12_VIEWPORT viewport{};
+			viewport.TopLeftX = 0.0f;
+			viewport.TopLeftY = 0.0f;
+			viewport.Width = static_cast<float>(w);
+			viewport.Height = static_cast<float>(h);
+			viewport.MinDepth = 0.0f;
+			viewport.MaxDepth = 1.0f;
+			commandListInstance_.get()->RSSetViewports(1, &viewport);
+
+			// シザー矩形の設定
+			D3D12_RECT scissorRect{};
+			scissorRect.left = 0;
+			scissorRect.top = 0;
+			scissorRect.right = w;
+			scissorRect.bottom = h;
+			commandListInstance_.get()->RSSetScissorRects(1, &scissorRect);
+
+			// ポリゴンの描画
+			trianglePolygonInstance_.draw(commandListInstance_);
 
 			//リソースバリアでレンダーターゲットをRenderTargetからPresentへ変更
 			auto rtToP = resourceBarrier(renderTargetInstance_.get(backBufferIndex), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
@@ -149,6 +201,11 @@ private:
 	Fence	fenceInstance_{};
 	UINT64	frameFenceValue_[2]{};
 	UINT64	nextFenceValue_ = 1;
+
+	RootSignature      rootSignatureInstance_{};  
+	Shader             shaderInstance_{}; 
+	PiplineStateObject piplineStateObjectInstance_{}; 
+	Triangle_Polygon    trianglePolygonInstance_{};
 };
 
 //エントリー関数
