@@ -141,6 +141,7 @@
     <ClCompile Include="render_target.cpp" />
     <ClCompile Include="root_signature.cpp" />
     <ClCompile Include="shader.cpp" />
+    <ClCompile Include="square_polygon.cpp" />
     <ClCompile Include="triangle_polygon.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
@@ -154,6 +155,7 @@
     <ClInclude Include="render_target.h" />
     <ClInclude Include="root_signature.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="square_polygon.h" />
     <ClInclude Include="triangle_polygon.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>

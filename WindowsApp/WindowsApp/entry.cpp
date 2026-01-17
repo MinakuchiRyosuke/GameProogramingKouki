@@ -10,6 +10,7 @@
 #include "shader.h"
 #include "pipline_state_object.h"
 #include "triangle_polygon.h"
+#include "square_polygon.h"
 
 #include <cassert>
 
@@ -75,6 +76,11 @@ public:
 			assert(false && "フェンスの作成に失敗しました");
 			return false;
 		}
+		//四角形ポリゴンの生成
+		if (!squarePolygonInstance_.create(dx12Instance_)) {
+			assert(false && "四角形ポリゴンの作成に失敗しました");
+			return false;
+		}
 		//三角形ポリゴンの生成
 		if (!trianglePolygonInstance_.create(dx12Instance_)) {
 			assert(false && "三角形ポリゴンの作成に失敗しました");
@@ -124,7 +130,7 @@ public:
 			commandListInstance_.get()->OMSetRenderTargets(1, handles, false, nullptr);
 
 			//レンダーターゲットのクリア
-			const float clearColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };	//赤色でクリア
+			const float clearColor[] = { 1.0f, 0.75f, 0.80f, 1.0f };	//赤色でクリア
 			commandListInstance_.get()->ClearRenderTargetView(handles[0], clearColor, 0, nullptr);
 
 			// パイプラインステートの設定
@@ -153,6 +159,7 @@ public:
 			commandListInstance_.get()->RSSetScissorRects(1, &scissorRect);
 
 			// ポリゴンの描画
+			squarePolygonInstance_.draw(commandListInstance_);
 			trianglePolygonInstance_.draw(commandListInstance_);
 
 			//リソースバリアでレンダーターゲットをRenderTargetからPresentへ変更
@@ -206,6 +213,7 @@ private:
 	Shader             shaderInstance_{}; 
 	PiplineStateObject piplineStateObjectInstance_{}; 
 	Triangle_Polygon    trianglePolygonInstance_{};
+	Square_Polygon		squarePolygonInstance_{};
 };
 
 //エントリー関数

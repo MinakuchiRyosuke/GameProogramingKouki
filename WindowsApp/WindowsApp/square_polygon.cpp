@@ -1,8 +1,8 @@
-#include "triangle_polygon.h"
+#include "square_polygon.h"
 #include <cassert>
 #include <DirectXMath.h>
 
-namespace{
+namespace {
 //頂点バッファフォーマット
 struct Vertex {
 	DirectX::XMFLOAT3 position;	//頂点座標
@@ -10,7 +10,7 @@ struct Vertex {
 };
 }
 
-Triangle_Polygon::~Triangle_Polygon() {
+Square_Polygon::~Square_Polygon() {
 	//頂点バッファの解放
 	if (vertexBuffer_) {
 		vertexBuffer_->Release();
@@ -24,8 +24,8 @@ Triangle_Polygon::~Triangle_Polygon() {
 }
 
 //ポリゴンの生成
-[[nodiscard]] bool Triangle_Polygon::create(const Dx12& dx12) noexcept {
-	//頂点バッファの生成
+[[nodiscard]] bool Square_Polygon::create(const Dx12& dx12) noexcept {
+	//頂点バッファ
 	if (!createVertexBuffer(dx12)) {
 		return false;
 	}
@@ -36,19 +36,20 @@ Triangle_Polygon::~Triangle_Polygon() {
 }
 
 //頂点バッファの生成
-[[nodiscard]] bool Triangle_Polygon::createVertexBuffer(const Dx12& dx12) noexcept {
-	//今回利用する三角形の頂点データ
-	Vertex triangleVertices[] = {
-		{  {0.0f, 0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}, //上頂点（赤色）
-		{ {0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}, //右下頂点（緑色）
-		{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}  //左下頂点（青色）
+[[nodiscard]] bool Square_Polygon::createVertexBuffer(const Dx12& dx12) noexcept {
+	//今回利用する四角形の頂点データ
+	Vertex squareVertices[] = {
+		{   {-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}}, //左上頂点（赤色）
+		{  {-0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}}, //左下頂点（赤色）
+		{ {0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}}, //右下頂点（赤色）
+		{{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}}  //右上頂点（赤色）
 	};
 
 	//頂点データのサイズ
-	const auto vertexBufferSize = sizeof(triangleVertices);
+	const auto vertexBufferSize = sizeof(squareVertices);
 
 	//ヒープの設定を指定
-	//CPUからアクセス可能なメモリを利用するための設定
+	//CPU～アクセス可能なメモリを利用するための設定
 	D3D12_HEAP_PROPERTIES heapProperty{};
 	heapProperty.Type = D3D12_HEAP_TYPE_UPLOAD;
 	heapProperty.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -56,7 +57,7 @@ Triangle_Polygon::~Triangle_Polygon() {
 	heapProperty.CreationNodeMask = 1;
 	heapProperty.VisibleNodeMask = 1;
 
-	//どんなリソースを作成するかの設定
+	//どんなリソースを設定するかの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 	resourceDesc.Alignment = 0;
@@ -77,18 +78,19 @@ Triangle_Polygon::~Triangle_Polygon() {
 		&resourceDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(&vertexBuffer_));
+		IID_PPV_ARGS(&vertexBuffer_)
+	);
 	if (FAILED(res)) {
 		assert(false && "頂点バッファの作成に失敗");
 		return false;
 	}
 
-	//頂点バッファにデータを転送する
-	//CPUからアクセス可能なアドレスを取得
+	//頂点バッファに出＾他を転送する
+	//CPUからアクセスかぬなアドレスを取得
 	Vertex* data{};
 
 	//バッファをマップ（CPUからアクセス可能にする）
-	//vertexBuffer_	を直接利用するのではなくdataを介して更新するイメージ
+	//vertexBuffer_ を利用宇するのではなくdataを介して更新するイメージ
 	res = vertexBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&data));
 	if (FAILED(res)) {
 		assert(false && "頂点バッファのマップに失敗");
@@ -96,30 +98,32 @@ Triangle_Polygon::~Triangle_Polygon() {
 	}
 
 	//頂点バッファをコピー
-	memcpy_s(data, vertexBufferSize, triangleVertices, vertexBufferSize);
+	memcpy_s(data, vertexBufferSize, squareVertices, vertexBufferSize);
 
 	//コピーが終わったのでマップ解除（CPUからアクセス不可にする）
-	//ここまで来たらGPUが利用売るメモリ領域（VRAM)にコピー済みなのでtriangleVertcesは不要になる
+	//ここまで来たらGPUが利用するメモリ領域（VRAM）にコピー済みなのでsquareVertcesは不要になる
 	vertexBuffer_->Unmap(0, nullptr);
 
 	//頂点バッファビューの設定
 	vertexBufferView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();	//頂点バッファのアドレス
-	vertexBufferView_.SizeInBytes = vertexBufferSize;							//頂点バッファのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(Vertex);							//1頂点当たりのサイズ
+	vertexBufferView_.SizeInBytes = vertexBufferSize;
+	vertexBufferView_.StrideInBytes = sizeof(Vertex);
 
 	return true;
 }
 
 //インデックスバッファの生成
-[[nodiscard]] bool Triangle_Polygon::createIndexBuffer(const Dx12& dx12) noexcept {
-	uint16_t triangleIndices[] = {
-		0, 1, 2		//三角形を構成する頂点のインデックス
+[[nodiscard]] bool Square_Polygon::createIndexBuffer(const Dx12& dx12) noexcept {
+	uint16_t squareIndices[] = {
+		//四角形を構成する頂点のインデックス
+		0, 2, 1	,	//左下の三角形
+		0, 3, 2		//右上の三角形
 	};
 
 	//インデックスデータのサイズ
-	const auto indexBufferSize = sizeof(triangleIndices);
+	const auto indexBufferSize = sizeof(squareIndices);
 
-	//	ヒープの設定を指定
+	//ヒープの設定を指定
 	D3D12_HEAP_PROPERTIES heapProperty{};
 	heapProperty.Type = D3D12_HEAP_TYPE_UPLOAD;
 	heapProperty.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -148,40 +152,41 @@ Triangle_Polygon::~Triangle_Polygon() {
 		&resourceDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(&indexBuffer_));
+		IID_PPV_ARGS(&indexBuffer_)
+	);
 	if (FAILED(res)) {
 		assert(false && "インデックスバッファの作成に失敗");
 		return false;
 	}
 
-	// インデックスバッファにデータを転送する
+	//インデックスバッファにデータを転送する
 	uint16_t* data{};
 	res = indexBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&data));
 	if (FAILED(res)) {
 		assert(false && "インデックスバッファのマップに失敗");
 		return false;
 	}
-	
-	memcpy_s(data, indexBufferSize, triangleIndices, indexBufferSize);
-	// ここまで来たら GPU が利用するメモリ領域（VRAM）にコピー済みなので、triangleIndices は不要になる
+
+	memcpy_s(data, indexBufferSize, squareIndices, indexBufferSize);
+	//ここまで来たらGPUが利用するメモリ領域（VRAM）にコピー済みなのでsquareIndicesは不要になる
 	indexBuffer_->Unmap(0, nullptr);
 
-	// インデックスバッファビュー作成
+	//インデックスバッファビュー作成
 	indexBufferView_.BufferLocation = indexBuffer_->GetGPUVirtualAddress();
 	indexBufferView_.SizeInBytes = indexBufferSize;
-	indexBufferView_.Format = DXGI_FORMAT_R16_UINT;  // triangleIndices の型が 16bit 符号なし整数なので R16_UINT
+	indexBufferView_.Format = DXGI_FORMAT_R16_UINT;	//squareIndicesの型が16bit符号なし整数なのでR16_UINT
 
 	return true;
 }
 
 //ポリゴンの描画
-[[nodiscard]] void Triangle_Polygon::draw(const CommandList& commandList) noexcept {
+[[nodiscard]] void Square_Polygon::draw(const CommandList& commandList) noexcept {
 	//頂点バッファの設定
 	commandList.get()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	//インデックスバッファの設定
 	commandList.get()->IASetIndexBuffer(&indexBufferView_);
-	//プリミティブ形状の設定（三角形）
+	//プリミティブ形状の設定(四角形）
 	commandList.get()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//描画コマンド
-	commandList.get()->DrawIndexedInstanced(3, 1, 0, 0, 0);
+	commandList.get()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
