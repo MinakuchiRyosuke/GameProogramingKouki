@@ -135,6 +135,7 @@
     <ClCompile Include="CommandAllocator.cpp" />
     <ClCompile Include="command_list.cpp" />
     <ClCompile Include="constant_buffer.cpp" />
+    <ClCompile Include="depth_buffer.cpp" />
     <ClCompile Include="descriptor_heap.cpp" />
     <ClCompile Include="Dx12.cpp" />
     <ClCompile Include="entry.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="CommandAllocator.h" />
     <ClInclude Include="command_list.h" />
     <ClInclude Include="constant_buffer.h" />
+    <ClInclude Include="depth_buffer.h" />
     <ClInclude Include="descriptor_heap.h" />
     <ClInclude Include="Dx12.h" />
     <ClInclude Include="fence.h" />
