@@ -39,9 +39,9 @@ Triangle_Polygon::~Triangle_Polygon() {
 [[nodiscard]] bool Triangle_Polygon::createVertexBuffer(const Dx12& dx12) noexcept {
 	//今回利用する三角形の頂点データ
 	Vertex triangleVertices[] = {
-		{  {0.0f, 0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}, //上頂点（赤色）
-		{ {0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}, //右下頂点（緑色）
-		{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}  //左下頂点（青色）
+		{  {0.0f, 0.3f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}, //上頂点（赤色）
+		{ {0.2f, -0.2f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}, //右下頂点（緑色）
+		{{-0.2f, -0.2f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}  //左下頂点（青色）
 	};
 
 	//頂点データのサイズ
