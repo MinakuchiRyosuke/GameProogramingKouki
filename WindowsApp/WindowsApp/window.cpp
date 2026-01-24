@@ -1,4 +1,5 @@
 #include "window.h"
+#include "input.h"
 
 namespace {
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -49,6 +50,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 //メッセージループ
 [[nodiscard]] bool Window::messageLoop() const noexcept {
 	MSG msg{};
+
+	Input::instance().updatePrevKeyState();	
+
 	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 		if (msg.message == WM_QUIT) {
 			return false;
@@ -56,6 +60,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		//メッセージ処理
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+
+		//キー情報の取得
+		static byte keyState[256]{};
+		if (GetKeyboardState(keyState)) {
+			//キー情報取得に成功したらInputクラスに情報を渡す
+			Input::instance().updateKeyState(keyState);
+		}
 	}
 	return true;
 }
