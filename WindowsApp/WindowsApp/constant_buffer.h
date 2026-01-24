@@ -7,7 +7,7 @@ class ConstantBuffer final
 {
 public:
 	ConstantBuffer() = default;
-	~ConstantBuffer() = default;
+	~ConstantBuffer();
 
 	//コンスタントバッファの生成
 	[[nodiscard]] bool create(const Dx12& dx12, const DescriptorHeap& descriptorHeap, UINT bufferSize, UINT descriptorIndex) noexcept;

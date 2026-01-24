@@ -10,8 +10,13 @@
 #include "root_signature.h"
 #include "shader.h"
 #include "pipline_state_object.h"
+#include "constant_buffer.h"
+
 #include "triangle_polygon.h"
 #include "square_polygon.h"
+
+#include "camera.h"
+#include "object.h"
 
 #include <cassert>
 
@@ -102,6 +107,30 @@ public:
 			assert(false && "パイプラインステートオブジェクトの作成に失敗しました");
 			return false;
 		}
+		// カメラの生成
+		cameraInstance_.initialize();
+
+		// 定数バッファ用ディスクリプタヒープの生成
+		// 定数バッファ用は CBV_SRV_UAV タイプで2つ分確保
+		if (!constantBufferDescriptorHeapInstance_.create(dx12Instance_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2, true)) {
+			assert(false && "定数バッファ用ディスクリプタヒープの作成に失敗しました");
+			return false;
+		}
+
+		// カメラ用コンスタントバッファの生成
+		// カメラ用はディスクリプタヒープの先頭に作成
+		if (!cameraConstantBufferInstance_.create(dx12Instance_, constantBufferDescriptorHeapInstance_, sizeof(Camera::ConstBufferData), 0)) {
+			assert(false && "カメラ用コンスタントバッファの作成に失敗しました");
+			return false;
+		}
+
+		// 三角形ポリゴン用コンスタントバッファの生成
+		// 三角形ポリゴン用はディスクリプタヒープの2番目に作成
+		if (!trianglePolygonConstantBufferInstance_.create(dx12Instance_, constantBufferDescriptorHeapInstance_, sizeof(Triangle_Polygon::ConstBufferData), 1)) {
+			assert(false && "三角形ポリゴン用コンスタントバッファの作成に失敗しました");
+			return false;
+		}
+
 
 		return true;
 	}
@@ -109,6 +138,14 @@ public:
 	//アプリケーションループ
 	void loop() noexcept {
 		while (windowInstance_.messageLoop()) {
+
+			//カメラの更新
+			cameraInstance_.update();
+			//三角形オブジェクトの更新
+			triangleObjectInstance_.update();
+			//四角形オブジェクトの更新
+			squareObjectInstance_.update();
+
 			//現在のバックバッファインデックスを取得
 			const auto backBufferIndex = dx12Instance_.getSwapChain()->GetCurrentBackBufferIndex();
 
@@ -158,6 +195,42 @@ public:
 			scissorRect.right = w;
 			scissorRect.bottom = h;
 			commandListInstance_.get()->RSSetScissorRects(1, &scissorRect);
+
+			// コンスタントバッファ用ディスクリプタヒープの設定
+			ID3D12DescriptorHeap* p[] = { constantBufferDescriptorHeapInstance_.get() };
+			commandListInstance_.get()->SetDescriptorHeaps(1, p);
+
+			// カメラのコンスタントバッファへデータ転送
+			Camera::ConstBufferData cameraData{
+				DirectX::XMMatrixTranspose(cameraInstance_.viewMatrix()),
+				DirectX::XMMatrixTranspose(cameraInstance_.projection()),
+			};
+			UINT8* pCameraData{};
+			cameraConstantBufferInstance_.constantBuffer()->Map(0, nullptr, reinterpret_cast<void**>(&pCameraData));
+			memcpy_s(pCameraData, sizeof(cameraData), &cameraData, sizeof(cameraData));
+			cameraConstantBufferInstance_.constantBuffer()->Unmap(0, nullptr);
+			commandListInstance_.get()->SetGraphicsRootDescriptorTable(0, cameraConstantBufferInstance_.getGpuDescriptorHandle());
+
+			// 三角形ポリゴンのコンスタントバッファへデータ転送
+			Triangle_Polygon::ConstBufferData triangleData{
+				DirectX::XMMatrixTranspose(triangleObjectInstance_.world()),
+				triangleObjectInstance_.color() };
+			UINT8* pTriangleData{};
+			trianglePolygonConstantBufferInstance_.constantBuffer()->Map(0, nullptr, reinterpret_cast<void**>(&pTriangleData));
+			memcpy_s(pTriangleData, sizeof(triangleData), &triangleData, sizeof(triangleData));
+			trianglePolygonConstantBufferInstance_.constantBuffer()->Unmap(0, nullptr);
+			commandListInstance_.get()->SetGraphicsRootDescriptorTable(1, trianglePolygonConstantBufferInstance_.getGpuDescriptorHandle());
+
+			// 四角形ポリゴンのコンスタントバッファへデータ転送
+			Square_Polygon::ConstBufferData squareData{
+				DirectX::XMMatrixTranspose(squareObjectInstance_.world()),
+				squareObjectInstance_.color() };
+			UINT8* pSquareData{};
+			squarePolygonConstantBufferInstance_.constantBuffer()->Map(0, nullptr, reinterpret_cast<void**>(&pSquareData));
+			memcpy_s(pSquareData, sizeof(squareData), &squareData, sizeof(squareData));
+			squarePolygonConstantBufferInstance_.constantBuffer()->Unmap(0, nullptr);
+			commandListInstance_.get()->SetGraphicsRootDescriptorTable(1, squarePolygonConstantBufferInstance_.getGpuDescriptorHandle());
+
 
 			// ポリゴンの描画
 			squarePolygonInstance_.draw(commandListInstance_);
@@ -213,8 +286,18 @@ private:
 	RootSignature      rootSignatureInstance_{};  
 	Shader             shaderInstance_{}; 
 	PiplineStateObject piplineStateObjectInstance_{}; 
+	DescriptorHeap	   constantBufferDescriptorHeapInstance_{};
+	
 	Triangle_Polygon    trianglePolygonInstance_{};
+	Object				triangleObjectInstance_{};
+	ConstantBuffer		trianglePolygonConstantBufferInstance_{};
+
 	Square_Polygon		squarePolygonInstance_{};
+	Object				squareObjectInstance_{};
+	ConstantBuffer		squarePolygonConstantBufferInstance_{};
+
+	Camera				cameraInstance_{};
+	ConstantBuffer		cameraConstantBufferInstance_{};
 };
 
 //エントリー関数

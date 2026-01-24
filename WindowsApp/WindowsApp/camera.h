@@ -6,7 +6,7 @@ class Camera final
 {
 public:
 	//コンスタントバッファ用データ構造体
-	struct ConstantBufferData {
+	struct ConstBufferData {
 		DirectX::XMMATRIX view_{};	//ビュー行列
 		DirectX::XMMATRIX projection_{};	//射影行列
 	};

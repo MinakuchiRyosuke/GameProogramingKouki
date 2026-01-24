@@ -1,6 +1,5 @@
 #include "square_polygon.h"
 #include <cassert>
-#include <DirectXMath.h>
 
 namespace {
 //頂点バッファフォーマット
@@ -116,8 +115,7 @@ Square_Polygon::~Square_Polygon() {
 [[nodiscard]] bool Square_Polygon::createIndexBuffer(const Dx12& dx12) noexcept {
 	uint16_t squareIndices[] = {
 		//四角形を構成する頂点のインデックス
-		0, 2, 1	,	//左下の三角形
-		0, 3, 2		//右上の三角形
+		0, 1, 2 , 3
 	};
 
 	//インデックスデータのサイズ
@@ -186,7 +184,7 @@ Square_Polygon::~Square_Polygon() {
 	//インデックスバッファの設定
 	commandList.get()->IASetIndexBuffer(&indexBufferView_);
 	//プリミティブ形状の設定(四角形）
-	commandList.get()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList.get()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	//描画コマンド
-	commandList.get()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	commandList.get()->DrawIndexedInstanced(4, 1, 0, 0, 0);
 }

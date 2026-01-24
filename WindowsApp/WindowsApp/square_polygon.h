@@ -1,8 +1,17 @@
 #pragma once
 #include"Dx12.h"
 #include"command_list.h"
+#include <DirectXMath.h>
+
 class Square_Polygon final
 {
+public:
+	//コンスタントバッファ用データ構造体
+	struct ConstBufferData {
+		DirectX::XMMATRIX world_{};  /// ワールド行列
+		DirectX::XMFLOAT4 color_{};  /// カラー(RGBA)
+	};
+
 public:
 	Square_Polygon() = default;
 	~Square_Polygon();

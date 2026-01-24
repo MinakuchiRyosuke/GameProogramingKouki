@@ -2,8 +2,8 @@
 #include <cassert>
 #include <string>
 
-#include <d3dcompiler.h>
-#pragma comment(lib, "d3dcompiler.lib")
+#include <D3Dcompiler.h>
+#pragma comment(lib, "D3Dcompiler.lib")
 
 Shader::~Shader() {
 	//頂点シェーダの解放

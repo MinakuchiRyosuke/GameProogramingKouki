@@ -131,13 +131,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="CommandAllocator.cpp" />
     <ClCompile Include="command_list.cpp" />
+    <ClCompile Include="constant_buffer.cpp" />
     <ClCompile Include="descriptor_heap.cpp" />
     <ClCompile Include="Dx12.cpp" />
     <ClCompile Include="entry.cpp" />
     <ClCompile Include="fence.cpp" />
     <ClCompile Include="input.cpp" />
+    <ClCompile Include="object.cpp" />
     <ClCompile Include="pipline_state_object.cpp" />
     <ClCompile Include="render_target.cpp" />
     <ClCompile Include="root_signature.cpp" />
@@ -147,12 +150,15 @@
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
     <ClInclude Include="CommandAllocator.h" />
     <ClInclude Include="command_list.h" />
+    <ClInclude Include="constant_buffer.h" />
     <ClInclude Include="descriptor_heap.h" />
     <ClInclude Include="Dx12.h" />
     <ClInclude Include="fence.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="object.h" />
     <ClInclude Include="pipline_state_object.h" />
     <ClInclude Include="render_target.h" />
     <ClInclude Include="root_signature.h" />

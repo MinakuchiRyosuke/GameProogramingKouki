@@ -1,6 +1,5 @@
 #include "triangle_polygon.h"
 #include <cassert>
-#include <DirectXMath.h>
 
 namespace{
 //頂点バッファフォーマット

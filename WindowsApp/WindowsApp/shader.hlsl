@@ -7,6 +7,20 @@ struct VSInput
 	float4 color : COLOR;		// 入力：頂点色
 };
 
+//カメラコンスタントバッファ
+cbuffer ConstantBuffer : register(b0)
+{
+    matrix view;
+    matrix projection;
+}
+
+//ポリゴンコンスタントバッファ
+cbuffer ConstantBuffer : register(b1)
+{
+    matrix world;
+    float4 color;
+}
+
 // 頂点シェーダの出力構造体
 struct VSOutput
 {
@@ -29,7 +43,13 @@ VSOutput vs(VSInput input)
 	VSOutput output;
     
     // 3D座標を4D同次座標に変換
-	output.position = float4(input.position, 1.0f);
+	float4 pos = float4(input.position, 1.0f);
+	
+    pos = mul(pos, world);	//ポリゴンのワールド行列でワールド変換
+    pos = mul(pos, view);		//カメラのビュー行列でビュー変換
+    pos = mul(pos, projection);	//カメラのプロジェクション行列でプロジェクション変換
+	
+    output.position = pos;
     
     // 色情報をそのまま次の段階に渡す
 	output.color = input.color;
